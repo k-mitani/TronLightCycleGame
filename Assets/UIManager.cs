@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class UIManager : MonoBehaviour
 {
+    public SettingManager settings;
+
     // Start is called before the first frame update
     void Start()
     {

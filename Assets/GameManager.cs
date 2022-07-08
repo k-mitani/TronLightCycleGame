@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    private UdpManager udp;
+    public UdpManager udp;
     private Queue<Data> queueMessage = new Queue<Data>();
 
     public UIManager ui;
@@ -32,7 +32,7 @@ public class GameManager : MonoBehaviour
             if (i == 2) color = new Color(0, 0.3f, 1); // 青
             if (i == 3) color = new Color(1, 0, 0); // 赤
             if (i == 4) color = new Color(0, 1, 0); // 緑
-            players[i] = new Player(this, playerPrefab, color);
+            players[i] = new Player(this, (byte)i, playerPrefab, color);
         }
 
         udp = new UdpManager(IPAddress.Parse("192.168.10.1"), 30000, 30000);
@@ -73,7 +73,7 @@ public class GameManager : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.DownArrow)) myPlayer1.OnDownKeyDown();
         else if (Input.GetKeyDown(KeyCode.RightArrow)) myPlayer1.OnRightKeyDown();
         else if (Input.GetKeyDown(KeyCode.LeftArrow)) myPlayer1.OnLeftKeyDown();
-        if (Input.GetKeyDown(KeyCode.Tab)) myPlayer2.OnStartButtonPress();
+        if (Input.GetKeyDown(KeyCode.F)) myPlayer2.OnStartButtonPress();
         else if (Input.GetKeyDown(KeyCode.W)) myPlayer2.OnUpKeyDown();
         else if (Input.GetKeyDown(KeyCode.S)) myPlayer2.OnDownKeyDown();
         else if (Input.GetKeyDown(KeyCode.D)) myPlayer2.OnRightKeyDown();
@@ -82,7 +82,7 @@ public class GameManager : MonoBehaviour
         // ESCなら設定画面を開く。
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            ui.gameObject.SetActive(!ui.gameObject.activeSelf);
+            ui.settings.gameObject.SetActive(!ui.settings.gameObject.activeSelf);
         }
     }
 

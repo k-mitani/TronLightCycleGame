@@ -122,7 +122,7 @@ public class LightCycle2D : MonoBehaviour
             return;
         }
 
-        // ローカル機体なので、とりあえずGMに伝えて後始末を行う。
+        // ローカル機体なので、とりあえずownerに伝えて後始末を行う。
         owner.OnLocalDead();
         OnDead();
     }

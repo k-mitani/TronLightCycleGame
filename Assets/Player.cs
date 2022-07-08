@@ -12,11 +12,15 @@ public class Player
     private Color _color;
     private LightCycle2D _cycle;
 
-    public Player(GameManager gm, LightCycle2D prefab, Color color)
+    private byte playerId;
+
+    public Player(GameManager gm, byte playerId, LightCycle2D prefab, Color color)
     {
         _gm = gm;
         _prefab = prefab;
         _color = color;
+
+        this.playerId = playerId;
     }
 
     public void OnReceive(Data d)
@@ -30,13 +34,9 @@ public class Player
                 _cycle.Abort();
                 _cycle = null;
             }
-            _cycle = GameObject.Instantiate(_prefab);
+            _cycle = InstantiateCycle(d.direction, false);
             _cycle.transform.position = d.position;
-            _cycle.initialDirection = d.direction;
             _cycle.speed = d.speed;
-            _cycle.isLocal = false;
-            _cycle.color = _color;
-            _cycle.owner = this;
         }
         // 方向転換
         else if (d.type == MessageType.Turn)
@@ -44,11 +44,7 @@ public class Player
             // 何らかの理由で自機が存在しないなら作る。
             if (_cycle == null)
             {
-                _cycle = GameObject.Instantiate(_prefab);
-                _cycle.initialDirection = d.direction;
-                _cycle.isLocal = false;
-                _cycle.color = _color;
-                _cycle.owner = this;
+                _cycle = InstantiateCycle(d.direction, false);
             }
             _cycle.transform.position = d.position;
             _cycle.speed = d.speed;
@@ -63,17 +59,14 @@ public class Player
         }
     }
 
-    public void OnStartButtonPress()
+    private LightCycle2D InstantiateCycle(Direction d, bool isLocal)
     {
-        // すでに自機が存在するなら何もしない。
-        if (_cycle != null) return;
-
-        _cycle = GameObject.Instantiate(_prefab);
-        _cycle.transform.position = new Vector3(-6, 0, 0);
-        _cycle.initialDirection = Direction.Right;
-        _cycle.isLocal = true;
-        _cycle.color = _color;
-        _cycle.owner = this;
+        var c = GameObject.Instantiate(_prefab);
+        c.initialDirection = d;
+        c.isLocal = isLocal;
+        c.color = _color;
+        c.owner = this;
+        return c;
     }
 
     internal void StartNpcThread(int npcSpawnOnStart, int npcSpawnInterval)
@@ -86,32 +79,75 @@ public class Player
         throw new NotImplementedException();
     }
 
+    private Data GetCurrentData(MessageType t)
+    {
+        var d = new Data();
+        d.type = t;
+        d.playerId = playerId;
+        d.direction = _cycle.currentDirection;
+        d.position = _cycle.transform.position;
+        d.speed = _cycle.speed;
+        return d;
+    }
+
+    public void OnStartButtonPress()
+    {
+        // すでに自機が存在するなら何もしない。
+        if (_cycle != null) return;
+
+        var initialDirection = Direction.Right;
+        _cycle = InstantiateCycle(initialDirection, true);
+        _cycle.transform.position = new Vector3(-6, 0, 0);
+
+        Data d = GetCurrentData(MessageType.Spawn);
+        d.direction = initialDirection;
+        _gm.udp.Send(d);
+    }
+
     internal void OnUpKeyDown()
     {
         if (_cycle == null) return;
+        if (_cycle.currentDirection == Direction.Down) return;
         _cycle.ChangeDirection(Direction.Up);
+
+        Data d = GetCurrentData(MessageType.Turn);
+        _gm.udp.Send(d);
     }
 
     internal void OnDownKeyDown()
     {
         if (_cycle == null) return;
+        if (_cycle.currentDirection == Direction.Up) return;
         _cycle.ChangeDirection(Direction.Down);
+
+        Data d = GetCurrentData(MessageType.Turn);
+        _gm.udp.Send(d);
     }
 
     internal void OnRightKeyDown()
     {
         if (_cycle == null) return;
+        if (_cycle.currentDirection == Direction.Left) return;
         _cycle.ChangeDirection(Direction.Right);
+
+        Data d = GetCurrentData(MessageType.Turn);
+        _gm.udp.Send(d);
     }
 
     internal void OnLeftKeyDown()
     {
         if (_cycle == null) return;
+        if (_cycle.currentDirection == Direction.Right) return;
         _cycle.ChangeDirection(Direction.Left);
+
+        Data d = GetCurrentData(MessageType.Turn);
+        _gm.udp.Send(d);
     }
 
     internal void OnLocalDead()
     {
+        Data d = GetCurrentData(MessageType.Dead);
+        _gm.udp.Send(d);
         _cycle = null;
     }
 }
