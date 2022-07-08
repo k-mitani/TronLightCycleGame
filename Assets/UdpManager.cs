@@ -40,19 +40,66 @@ public enum Direction : byte
 public class UdpManager : IDisposable
 {
 	private Thread _thread;
+	private Thread _thread2;
 	private UdpClient _udp;
 	private IPEndPoint _local;
+	private IPEndPoint _remote;
 
 	public event EventHandler<Data> Receive;
 
-	public UdpManager(int localPort)
+	public UdpManager(IPAddress remoteAddress, int remotePort, int localPort)
     {
-		var address = "0.0.0.0";
-		_local = new IPEndPoint(IPAddress.Parse(address), localPort);
+		_local = new IPEndPoint(IPAddress.Parse("0.0.0.0"), localPort);
+		_remote = new IPEndPoint(remoteAddress, remotePort);
 		_udp = new UdpClient(localPort);
 		_thread = new Thread(DoLoop);
 		_thread.Start();
+
+		//_thread2 = new Thread(() =>
+		//{
+		//	var tcp = new TcpListener(new IPEndPoint(IPAddress.Parse("0.0.0.0"), 30001));
+		//	tcp.Start();
+		//	while (true)
+  //          {
+		//		var cli = tcp.AcceptTcpClient();
+		//		Task.Run(() =>
+		//		{
+		//			cli.GetStream().WriteByte(0xff);
+		//			//Debug.Log("sent");
+		//		});
+  //          }
+		//});
+
+		//Task.Run(() =>
+		//{
+		//	var udp = new UdpClient();
+  //          while (true)
+  //          {
+		//		var d = new Data();
+		//		d.playerId = 3;
+		//		d.position = new Vector3(4, 1, 0);
+		//		d.direction = Direction.Left;
+		//		d.speed = 10;
+		//		d.type = MessageType.Spawn;
+		//		var bytes = Serialize(d);
+		//		udp.Send(bytes, bytes.Length, new IPEndPoint(IPAddress.Parse("192.168.10.11"), 30000));
+		//		Thread.Sleep(1000);
+		//		udp.Send(bytes, bytes.Length, new IPEndPoint(IPAddress.Parse("192.168.10.10"), 30000));
+		//		Thread.Sleep(1000);
+		//		udp.Send(bytes, bytes.Length, new IPEndPoint(IPAddress.Parse("127.0.0.1"), 30000));
+		//		Thread.Sleep(1000);
+		//		//Debug.Log("foo");
+		//	}
+		//});
 	}
+
+	private byte[] _buff = new byte[4096];
+	private int _dataSize = Marshal.SizeOf<Data>();
+	public void Send(Data d)
+    {
+		Serialize(d, _buff);
+		_udp.Send(_buff, _dataSize, _remote);
+    }
 
 	private void DoLoop()
     {

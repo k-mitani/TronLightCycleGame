@@ -72,7 +72,18 @@ public class Player
         _cycle.transform.position = new Vector3(-6, 0, 0);
         _cycle.initialDirection = Direction.Right;
         _cycle.isLocal = true;
+        _cycle.color = _color;
         _cycle.owner = this;
+    }
+
+    internal void StartNpcThread(int npcSpawnOnStart, int npcSpawnInterval)
+    {
+        throw new NotImplementedException();
+    }
+
+    internal void StopNpcThread()
+    {
+        throw new NotImplementedException();
     }
 
     internal void OnUpKeyDown()
