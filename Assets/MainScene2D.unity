@@ -2377,8 +2377,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ui: {fileID: 1649933572}
   playerPrefab: {fileID: 3769176866436148736, guid: f1a1635d983984545889a194475ce088, type: 3}
-  myPlayerId1: 2
-  myPlayerId2: 3
+  myPlayerId1: 1
+  myPlayerId2: 2
   npcPlayerId: 0
 --- !u!4 &711867143
 Transform:
@@ -4898,7 +4898,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1186982804
 RectTransform:
   m_ObjectHideFlags: 0

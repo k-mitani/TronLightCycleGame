@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -71,12 +70,10 @@ public class Player
 
     internal void StartNpcThread(int npcSpawnOnStart, int npcSpawnInterval)
     {
-        throw new NotImplementedException();
     }
 
     internal void StopNpcThread()
     {
-        throw new NotImplementedException();
     }
 
     private Data GetCurrentData(MessageType t)
@@ -95,12 +92,19 @@ public class Player
         // すでに自機が存在するなら何もしない。
         if (_cycle != null) return;
 
-        var initialDirection = Direction.Right;
-        _cycle = InstantiateCycle(initialDirection, true);
-        _cycle.transform.position = new Vector3(-6, 0, 0);
+        // プレーヤー1234は決め打ち。その他はランダム
+        var (position, direction) =
+            playerId == 1 ? (new Vector3(-6, +3, 0), Direction.Right) :
+            playerId == 2 ? (new Vector3(+6, -3, 0), Direction.Left) :
+            playerId == 3 ? (new Vector3(-6, -3, 0), Direction.Up) :
+            playerId == 4 ? (new Vector3(+6, +3, 0), Direction.Down) :
+            (new Vector3(Random.Range(-5f, +5f), Random.Range(-2f, +2f), 0),
+            (Direction)Random.Range(1, 5));
+        _cycle = InstantiateCycle(direction, true);
+        _cycle.transform.position = position;
 
         Data d = GetCurrentData(MessageType.Spawn);
-        d.direction = initialDirection;
+        d.direction = direction;
         _gm.udp.Send(d);
     }
 

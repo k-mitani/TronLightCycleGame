@@ -48,10 +48,10 @@ public class GameManager : MonoBehaviour
     {
         // 通信設定を更新する。
         var oldUdp = udp;
-        udp = new UdpManager(remoteAddress, remotePort, localPort);
-        udp.Receive += Udp_Receive;
         oldUdp.Receive -= Udp_Receive;
         oldUdp.Dispose();
+        udp = new UdpManager(remoteAddress, remotePort, localPort);
+        udp.Receive += Udp_Receive;
 
         // プレーヤー設定を更新する。
         myPlayerId1 = playerId1;
@@ -78,6 +78,27 @@ public class GameManager : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.S)) myPlayer2.OnDownKeyDown();
         else if (Input.GetKeyDown(KeyCode.D)) myPlayer2.OnRightKeyDown();
         else if (Input.GetKeyDown(KeyCode.A)) myPlayer2.OnLeftKeyDown();
+
+        if (Input.GetButtonDown("P1Start")) myPlayer1.OnStartButtonPress();
+        else if (Input.GetAxis("P1Vertical") < -0.99) myPlayer1.OnUpKeyDown();
+        else if (Input.GetAxis("P1Vertical") > +0.99) myPlayer1.OnDownKeyDown();
+        else if (Input.GetAxis("P1Horizontal") > +0.99) myPlayer1.OnRightKeyDown();
+        else if (Input.GetAxis("P1Horizontal") < -0.99) myPlayer1.OnLeftKeyDown();
+        else if (Input.GetAxis("P1VerticalDPad") < -0.99) myPlayer1.OnUpKeyDown();
+        else if (Input.GetAxis("P1VerticalDPad") > +0.99) myPlayer1.OnDownKeyDown();
+        else if (Input.GetAxis("P1HorizontalDPad") > +0.99) myPlayer1.OnRightKeyDown();
+        else if (Input.GetAxis("P1HorizontalDPad") < -0.99) myPlayer1.OnLeftKeyDown();
+        if (Input.GetButtonDown("P2Start")) myPlayer2.OnStartButtonPress();
+        else if (Input.GetAxis("P2Vertical") < -0.99) myPlayer2.OnUpKeyDown();
+        else if (Input.GetAxis("P2Vertical") > +0.99) myPlayer2.OnDownKeyDown();
+        else if (Input.GetAxis("P2Horizontal") > +0.99) myPlayer2.OnRightKeyDown();
+        else if (Input.GetAxis("P2Horizontal") < -0.99) myPlayer2.OnLeftKeyDown();
+        else if (Input.GetAxis("P2VerticalDPad") < -0.99) myPlayer2.OnUpKeyDown();
+        else if (Input.GetAxis("P2VerticalDPad") > +0.99) myPlayer2.OnDownKeyDown();
+        else if (Input.GetAxis("P2HorizontalDPad") > +0.99) myPlayer2.OnRightKeyDown();
+        else if (Input.GetAxis("P2HorizontalDPad") < -0.99) myPlayer2.OnLeftKeyDown();
+
+        Debug.Log(Input.GetJoystickNames());
 
         // ESCなら設定画面を開く。
         if (Input.GetKeyDown(KeyCode.Escape))

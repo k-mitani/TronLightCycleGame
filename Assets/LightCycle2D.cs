@@ -25,6 +25,8 @@ public class LightCycle2D : MonoBehaviour
     private new SpriteRenderer renderer;
     private Light light;
 
+    private bool shouldMuteki = true;
+
 
     void Start()
     {
@@ -43,6 +45,14 @@ public class LightCycle2D : MonoBehaviour
         trails.Add(currentTrail);
         currentTrail.name = nameof(currentTrail);
         ChangeDirection(initialDirection);
+
+        StartCoroutine(SetMutekiOff());
+    }
+
+    IEnumerator SetMutekiOff()
+    {
+        yield return new WaitForSeconds(0.3f);
+        shouldMuteki = false;
     }
 
     void Update()
@@ -115,9 +125,17 @@ public class LightCycle2D : MonoBehaviour
             return;
         }
 
-        // 
-        var isLastTrail = collision.gameObject == lastWayPointTrail.gameObject;
+        // 曲がった直後の場合は直前の軌跡に衝突するので無視する。
+        var isLastTrail =
+            lastWayPointTrail != null &&
+            lastWayPointTrail.gameObject == collision.gameObject;
         if (isLastTrail && Time.frameCount - lastWayPointFrameCount < 60)
+        {
+            return;
+        }
+
+        // スポーン直後は衝突判定なしにする。
+        if (shouldMuteki)
         {
             return;
         }
