@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -21,9 +22,13 @@ public class GameManager : MonoBehaviour
     private Player myPlayer2 => players[myPlayerId2];
     private Player npcPlayer => players[npcPlayerId];
 
+    private SynchronizationContext _context;
+    public void Invoke(SendOrPostCallback action) => _context.Send(action, null);
+
     // Start is called before the first frame update
     void Start()
     {
+        _context = SynchronizationContext.Current;
         players = new Player[byte.MaxValue + 1];
         for (int i = 0; i < players.Length; i++)
         {
@@ -35,7 +40,7 @@ public class GameManager : MonoBehaviour
             players[i] = new Player(this, (byte)i, playerPrefab, color);
         }
 
-        udp = new UdpManager(IPAddress.Parse("192.168.10.1"), 30000, 30000);
+        udp = new UdpManager(IPAddress.Parse("192.168.10.1"), 30000, 30001);
         udp.Receive += Udp_Receive;
     }
 
@@ -65,10 +70,16 @@ public class GameManager : MonoBehaviour
         // TODO endless
     }
 
+    private void OnStartButtonPress(Player player)
+    {
+        player.OnStartButtonPress();
+        npcPlayer.OnPcStart();
+    }
+
     void Update()
     {
         // ローカルの操作をPlayerオブジェクトに伝える。
-        if (Input.GetKeyDown(KeyCode.Return)) myPlayer1.OnStartButtonPress();
+        if (Input.GetKeyDown(KeyCode.Return))  OnStartButtonPress(myPlayer1);
         else if (Input.GetKeyDown(KeyCode.UpArrow)) myPlayer1.OnUpKeyDown();
         else if (Input.GetKeyDown(KeyCode.DownArrow)) myPlayer1.OnDownKeyDown();
         else if (Input.GetKeyDown(KeyCode.RightArrow)) myPlayer1.OnRightKeyDown();
@@ -79,7 +90,7 @@ public class GameManager : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.D)) myPlayer2.OnRightKeyDown();
         else if (Input.GetKeyDown(KeyCode.A)) myPlayer2.OnLeftKeyDown();
 
-        if (Input.GetButtonDown("P1Start")) myPlayer1.OnStartButtonPress();
+        if (Input.GetButtonDown("P1Start")) OnStartButtonPress(myPlayer1);
         else if (Input.GetAxis("P1Vertical") < -0.99) myPlayer1.OnUpKeyDown();
         else if (Input.GetAxis("P1Vertical") > +0.99) myPlayer1.OnDownKeyDown();
         else if (Input.GetAxis("P1Horizontal") > +0.99) myPlayer1.OnRightKeyDown();
@@ -88,7 +99,7 @@ public class GameManager : MonoBehaviour
         else if (Input.GetAxis("P1VerticalDPad") > +0.99) myPlayer1.OnDownKeyDown();
         else if (Input.GetAxis("P1HorizontalDPad") > +0.99) myPlayer1.OnRightKeyDown();
         else if (Input.GetAxis("P1HorizontalDPad") < -0.99) myPlayer1.OnLeftKeyDown();
-        if (Input.GetButtonDown("P2Start")) myPlayer2.OnStartButtonPress();
+        if (Input.GetButtonDown("P2Start")) OnStartButtonPress(myPlayer2);
         else if (Input.GetAxis("P2Vertical") < -0.99) myPlayer2.OnUpKeyDown();
         else if (Input.GetAxis("P2Vertical") > +0.99) myPlayer2.OnDownKeyDown();
         else if (Input.GetAxis("P2Horizontal") > +0.99) myPlayer2.OnRightKeyDown();
@@ -97,8 +108,6 @@ public class GameManager : MonoBehaviour
         else if (Input.GetAxis("P2VerticalDPad") > +0.99) myPlayer2.OnDownKeyDown();
         else if (Input.GetAxis("P2HorizontalDPad") > +0.99) myPlayer2.OnRightKeyDown();
         else if (Input.GetAxis("P2HorizontalDPad") < -0.99) myPlayer2.OnLeftKeyDown();
-
-        Debug.Log(Input.GetJoystickNames());
 
         // ESCなら設定画面を開く。
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -120,5 +129,6 @@ public class GameManager : MonoBehaviour
     private void OnDestroy()
     {
         udp.Dispose();
+        npcPlayer.StopNpcThread();
     }
 }

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -68,12 +69,97 @@ public class Player
         return c;
     }
 
+    private Thread _threadNpc;
+    private AutoResetEvent _signalLocalStart = new AutoResetEvent(false);
+    private int _npcSpawnOnStart;
+    private int _npcSpawnInterval;
     internal void StartNpcThread(int npcSpawnOnStart, int npcSpawnInterval)
     {
+        _npcSpawnOnStart = npcSpawnOnStart;
+        _npcSpawnInterval = npcSpawnInterval;
+        _threadNpc = new Thread(DoNpcLoop);
+        _threadNpc.Start();
+    }
+
+    public void OnPcStart()
+    {
+        if (_npcSpawnOnStart > 0)
+        {
+            _gm.StartCoroutine(NotifyPcStart());
+        }
+    }
+    public System.Collections.IEnumerator NotifyPcStart()
+    {
+        yield return new WaitForSeconds(_npcSpawnOnStart / 1000f);
+        _signalLocalStart.Set();
+    }
+
+    private void DoNpcLoop()
+    {
+        while (true)
+        {
+            try
+            {
+                _signalLocalStart.Reset();
+                if (_npcSpawnInterval != 0)
+                {
+                    // プレーヤーのSpawn通知が来るか、生成インターバル終了まで待機する。
+                    _signalLocalStart.WaitOne(_npcSpawnInterval);
+                }
+                else
+                {
+                    _signalLocalStart.WaitOne();
+                }
+
+                // 自機を生成する。
+                _gm.Invoke(_ =>
+                {
+                    OnStartButtonPress();
+                });
+
+                // Deadになるまで適当に移動する。
+                while (_cycle != null)
+                {
+                    var randomWait = 0;
+                    _gm.Invoke(_ => randomWait = Random.Range(200, 300));
+
+                    Thread.Sleep(randomWait);
+                    if (_cycle == null) break;
+                    _gm.Invoke(_ =>
+                    {
+                        // 適当な方向に方向転換する。
+                        var dir = Random.Range(0, 4);
+                        if (dir == 0 && _cycle.currentDirection != Direction.Up) OnUpKeyDown();
+                        else if (dir == 1 && _cycle.currentDirection != Direction.Down) OnDownKeyDown();
+                        else if (dir == 2 && _cycle.currentDirection != Direction.Right) OnRightKeyDown();
+                        else if (dir == 3 && _cycle.currentDirection != Direction.Left) OnLeftKeyDown();
+                    });
+                }
+            }
+            catch (System.Exception ex)
+            {
+                if (ex is ThreadAbortException)
+                {
+                    // 自機があれば消す。
+                    if (_cycle != null)
+                    {
+                        _gm.Invoke(_ =>
+                        {
+                            _cycle.OnDead();
+                            OnLocalDead();
+                        });
+                    }
+                    Debug.Log("NpcThread Aborted");
+                    return;
+                }
+                Debug.Log("NpcThread Error: " + ex.ToString());
+            }
+        }
     }
 
     internal void StopNpcThread()
     {
+        if (_threadNpc != null) _threadNpc.Abort();
     }
 
     private Data GetCurrentData(MessageType t)

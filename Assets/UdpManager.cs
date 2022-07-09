@@ -105,9 +105,18 @@ public class UdpManager : IDisposable
     {
         while (true)
         {
-			var bytes = _udp.Receive(ref _local);
-			var d = Deserialize<Data>(bytes);
-			Receive?.Invoke(this, d);
+            try
+            {
+				var bytes = _udp.Receive(ref _local);
+				var d = Deserialize<Data>(bytes);
+				Receive?.Invoke(this, d);
+			}
+			catch (Exception ex)
+            {
+				if (ex is ThreadAbortException) return;
+				Debug.Log(ex.Message);
+				Thread.Sleep(100);
+            }
 		}
     }
 
