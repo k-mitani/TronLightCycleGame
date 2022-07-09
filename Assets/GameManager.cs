@@ -107,15 +107,16 @@ public class GameManager : MonoBehaviour
         else if (Input.GetAxis("P1VerticalDPad") > +0.99) myPlayer1.OnDownKeyDown();
         else if (Input.GetAxis("P1HorizontalDPad") > +0.99) myPlayer1.OnRightKeyDown();
         else if (Input.GetAxis("P1HorizontalDPad") < -0.99) myPlayer1.OnLeftKeyDown();
-        if (Input.GetButtonDown("P2Start")) OnStartButtonPress(myPlayer2);
-        else if (Input.GetAxis("P2Vertical") < -0.99) myPlayer2.OnUpKeyDown();
-        else if (Input.GetAxis("P2Vertical") > +0.99) myPlayer2.OnDownKeyDown();
-        else if (Input.GetAxis("P2Horizontal") > +0.99) myPlayer2.OnRightKeyDown();
-        else if (Input.GetAxis("P2Horizontal") < -0.99) myPlayer2.OnLeftKeyDown();
-        else if (Input.GetAxis("P2VerticalDPad") < -0.99) myPlayer2.OnUpKeyDown();
-        else if (Input.GetAxis("P2VerticalDPad") > +0.99) myPlayer2.OnDownKeyDown();
-        else if (Input.GetAxis("P2HorizontalDPad") > +0.99) myPlayer2.OnRightKeyDown();
-        else if (Input.GetAxis("P2HorizontalDPad") < -0.99) myPlayer2.OnLeftKeyDown();
+        // Android版は2コンはなしにする。なぜか上下左右キーで2コン操作になってしまうので。
+        //if (Input.GetButtonDown("P2Start")) OnStartButtonPress(myPlayer2);
+        //else if (Input.GetAxis("P2Vertical") < -0.99) myPlayer2.OnUpKeyDown();
+        //else if (Input.GetAxis("P2Vertical") > +0.99) myPlayer2.OnDownKeyDown();
+        //else if (Input.GetAxis("P2Horizontal") > +0.99) myPlayer2.OnRightKeyDown();
+        //else if (Input.GetAxis("P2Horizontal") < -0.99) myPlayer2.OnLeftKeyDown();
+        //else if (Input.GetAxis("P2VerticalDPad") < -0.99) myPlayer2.OnUpKeyDown();
+        //else if (Input.GetAxis("P2VerticalDPad") > +0.99) myPlayer2.OnDownKeyDown();
+        //else if (Input.GetAxis("P2HorizontalDPad") > +0.99) myPlayer2.OnRightKeyDown();
+        //else if (Input.GetAxis("P2HorizontalDPad") < -0.99) myPlayer2.OnLeftKeyDown();
 
         // ESCなら設定画面を開く。
         if (Input.GetKeyDown(KeyCode.Escape))
