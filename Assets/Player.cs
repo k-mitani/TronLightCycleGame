@@ -118,9 +118,9 @@ public class Player
                 });
 
                 // Deadになるまで適当に移動する。
+                var randomWait = 0;
                 while (_cycle != null)
                 {
-                    var randomWait = 0;
                     _gm.Invoke(_ => randomWait = Random.Range(200, 300));
 
                     Thread.Sleep(randomWait);
@@ -184,14 +184,25 @@ public class Player
             playerId == 2 ? (new Vector3(+6, -3, 0), Direction.Left) :
             playerId == 3 ? (new Vector3(-6, -3, 0), Direction.Up) :
             playerId == 4 ? (new Vector3(+6, +3, 0), Direction.Down) :
-            (new Vector3(Random.Range(-5f, +5f), Random.Range(-2f, +2f), 0),
-            (Direction)Random.Range(1, 5));
+            (CreateRandomEdgePosition(), (Direction)Random.Range(1, 5));
         _cycle = InstantiateCycle(direction, true);
         _cycle.transform.position = position;
 
         Data d = GetCurrentData(MessageType.Spawn);
         d.direction = direction;
         _gm.udp.Send(d);
+    }
+
+    private Vector3 CreateRandomEdgePosition()
+    {
+        var xmax = 6.5f;
+        var xmin = 5.5f;
+        var ymax = 3.25f;
+        var ymin = 2.0f;
+        if (Random.value < 0.25) return new Vector3(Random.Range(-xmax, xmax), +Random.Range(ymin, ymax), 0);
+        if (Random.value < 0.25) return new Vector3(Random.Range(-xmax, xmax), -Random.Range(ymin, ymax), 0);
+        if (Random.value < 0.25) return new Vector3(+Random.Range(xmin, xmax), Random.Range(-ymax, ymax), 0);
+        return new Vector3(-Random.Range(xmin, xmax), Random.Range(-ymax, ymax), 0);
     }
 
     internal void OnUpKeyDown()

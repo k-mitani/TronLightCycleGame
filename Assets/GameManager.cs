@@ -40,9 +40,17 @@ public class GameManager : MonoBehaviour
             players[i] = new Player(this, (byte)i, playerPrefab, color);
         }
 
-        udp = new UdpManager(IPAddress.Parse("192.168.10.1"), 30000, 30001);
+        udp = new UdpManager(IPAddress.Parse("192.168.10.1"), 30000, 30000);
         udp.Receive += Udp_Receive;
+        StartCoroutine(ApplySettingForStart());
     }
+
+    IEnumerator ApplySettingForStart()
+    {
+        yield return null;
+        ui.settings.OnApplyButtonClick();
+    }
+
 
     private void Udp_Receive(object sender, Data d)
     {

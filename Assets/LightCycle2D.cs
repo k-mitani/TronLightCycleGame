@@ -23,7 +23,7 @@ public class LightCycle2D : MonoBehaviour
 
     private ParticleSystem particle;
     private new SpriteRenderer renderer;
-    private Light light;
+    private new Light light;
 
     private bool shouldMuteki = true;
 
@@ -51,7 +51,7 @@ public class LightCycle2D : MonoBehaviour
 
     IEnumerator SetMutekiOff()
     {
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSeconds(0.1f);
         shouldMuteki = false;
     }
 
@@ -129,7 +129,8 @@ public class LightCycle2D : MonoBehaviour
         var isLastTrail =
             lastWayPointTrail != null &&
             lastWayPointTrail.gameObject == collision.gameObject;
-        if (isLastTrail && Time.frameCount - lastWayPointFrameCount < 60)
+        var isCurrentTrail = currentTrail.gameObject == collision.gameObject;
+        if ((isLastTrail || isCurrentTrail) && Time.frameCount - lastWayPointFrameCount < 60)
         {
             return;
         }
