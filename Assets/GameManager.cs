@@ -16,11 +16,13 @@ public class GameManager : MonoBehaviour
     public byte myPlayerId1;
     public byte myPlayerId2;
     public byte npcPlayerId;
+    public byte npcPlayerId2 = 250;
 
     private Player[] players;
     private Player myPlayer1 => players[myPlayerId1];
     private Player myPlayer2 => players[myPlayerId2];
     private Player npcPlayer => players[npcPlayerId];
+    private Player npcPlayer2 => players[npcPlayerId2];
 
     private SynchronizationContext _context;
     public void Invoke(SendOrPostCallback action) => _context.Send(action, null);
@@ -74,6 +76,7 @@ public class GameManager : MonoBehaviour
         oldNpcPlayer.StopNpcThread();
         npcPlayerId = playerIdNpc;
         npcPlayer.StartNpcThread(npcSpawnOnStart, npcSpawnInterval);
+        npcPlayer2.StartNpcThread(npcSpawnOnStart, npcSpawnInterval);
 
         // TODO endless
     }
@@ -82,6 +85,7 @@ public class GameManager : MonoBehaviour
     {
         player.OnStartButtonPress();
         npcPlayer.OnPcStart();
+        npcPlayer2.OnPcStart();
     }
 
     void Update()
@@ -138,5 +142,6 @@ public class GameManager : MonoBehaviour
     {
         udp.Dispose();
         npcPlayer.StopNpcThread();
+        npcPlayer2.StopNpcThread();
     }
 }

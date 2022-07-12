@@ -49,11 +49,11 @@ public class UdpManager : IDisposable
 
 	public UdpManager(IPAddress remoteAddress, int remotePort, int localPort)
     {
-		_local = new IPEndPoint(IPAddress.Parse("0.0.0.0"), localPort);
-		_remote = new IPEndPoint(remoteAddress, remotePort);
-		_udp = new UdpClient(localPort);
-		_thread = new Thread(DoLoop);
-		_thread.Start();
+		//_local = new IPEndPoint(IPAddress.Parse("0.0.0.0"), localPort);
+		//_remote = new IPEndPoint(remoteAddress, remotePort);
+		//_udp = new UdpClient(localPort);
+		//_thread = new Thread(DoLoop);
+		//_thread.Start();
 
 		//_thread2 = new Thread(() =>
 		//{
@@ -97,27 +97,27 @@ public class UdpManager : IDisposable
 	private int _dataSize = Marshal.SizeOf<Data>();
 	public void Send(Data d)
     {
-		Serialize(d, _buff);
-		_udp.Send(_buff, _dataSize, _remote);
+		//Serialize(d, _buff);
+		//_udp.Send(_buff, _dataSize, _remote);
     }
 
 	private void DoLoop()
     {
-        while (true)
-        {
-            try
-            {
-				var bytes = _udp.Receive(ref _local);
-				var d = Deserialize<Data>(bytes);
-				Receive?.Invoke(this, d);
-			}
-			catch (Exception ex)
-            {
-				if (ex is ThreadAbortException) return;
-				Debug.Log(ex.Message);
-				Thread.Sleep(100);
-            }
-		}
+  //      while (true)
+  //      {
+  //          try
+  //          {
+		//		var bytes = _udp.Receive(ref _local);
+		//		var d = Deserialize<Data>(bytes);
+		//		Receive?.Invoke(this, d);
+		//	}
+		//	catch (Exception ex)
+  //          {
+		//		if (ex is ThreadAbortException) return;
+		//		Debug.Log(ex.Message);
+		//		Thread.Sleep(100);
+  //          }
+		//}
     }
 
 	public static unsafe T Deserialize<T>(byte[] bytes, int startIndex = 0) where T : struct
@@ -141,7 +141,7 @@ public class UdpManager : IDisposable
 
     public void Dispose()
     {
-		_thread.Abort();
-		_udp.Dispose();
+		//_thread.Abort();
+		//_udp.Dispose();
     }
 }

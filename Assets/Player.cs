@@ -73,12 +73,12 @@ public class Player
     private AutoResetEvent _signalLocalStart = new AutoResetEvent(false);
     private int _npcSpawnOnStart;
     private int _npcSpawnInterval;
+    private int _currentThreadId = 0;
     internal void StartNpcThread(int npcSpawnOnStart, int npcSpawnInterval)
     {
         _npcSpawnOnStart = npcSpawnOnStart;
         _npcSpawnInterval = npcSpawnInterval;
-        _threadNpc = new Thread(DoNpcLoop);
-        _threadNpc.Start();
+        _gm.StartCoroutine(DoNpcLoop());
     }
 
     public void OnPcStart()
@@ -94,72 +94,62 @@ public class Player
         _signalLocalStart.Set();
     }
 
-    private void DoNpcLoop()
+    private System.Collections.IEnumerator DoNpcLoop()
     {
+        var threadId = _currentThreadId;
         while (true)
         {
-            try
+            yield return new WaitForSeconds(_npcSpawnInterval / 1000f);
+            //_signalLocalStart.Reset();
+            //if (_npcSpawnInterval != 0)
+            //{
+            //    // プレーヤーのSpawn通知が来るか、生成インターバル終了まで待機する。
+            //    _signalLocalStart.WaitOne(_npcSpawnInterval);
+            //}
+            //else
+            //{
+            //    _signalLocalStart.WaitOne();
+            //}
+
+            // 自機を生成する。
+            OnStartButtonPress();
+
+            // Deadになるまで適当に移動する。
+            var randomWait = 0;
+            while (_cycle != null)
             {
-                _signalLocalStart.Reset();
-                if (_npcSpawnInterval != 0)
-                {
-                    // プレーヤーのSpawn通知が来るか、生成インターバル終了まで待機する。
-                    _signalLocalStart.WaitOne(_npcSpawnInterval);
-                }
-                else
-                {
-                    _signalLocalStart.WaitOne();
-                }
+                randomWait = Random.Range(200, 300);
+                yield return new WaitForSeconds(_npcSpawnInterval / 1000f);
 
-                // 自機を生成する。
-                _gm.Invoke(_ =>
-                {
-                    OnStartButtonPress();
-                });
 
-                // Deadになるまで適当に移動する。
-                var randomWait = 0;
-                while (_cycle != null)
+                if (_cycle == null) break;
+                // 適当な方向に方向転換する。
+                var dir = Random.Range(0, 4);
+                if (dir == 0 && _cycle.currentDirection != Direction.Up) OnUpKeyDown();
+                else if (dir == 1 && _cycle.currentDirection != Direction.Down) OnDownKeyDown();
+                else if (dir == 2 && _cycle.currentDirection != Direction.Right) OnRightKeyDown();
+                else if (dir == 3 && _cycle.currentDirection != Direction.Left) OnLeftKeyDown();
+            }
+            if (_currentThreadId != threadId)
+            {
+                // 自機があれば消す。
+                if (_cycle != null)
                 {
-                    _gm.Invoke(_ => randomWait = Random.Range(200, 300));
-
-                    Thread.Sleep(randomWait);
-                    if (_cycle == null) break;
                     _gm.Invoke(_ =>
                     {
-                        // 適当な方向に方向転換する。
-                        var dir = Random.Range(0, 4);
-                        if (dir == 0 && _cycle.currentDirection != Direction.Up) OnUpKeyDown();
-                        else if (dir == 1 && _cycle.currentDirection != Direction.Down) OnDownKeyDown();
-                        else if (dir == 2 && _cycle.currentDirection != Direction.Right) OnRightKeyDown();
-                        else if (dir == 3 && _cycle.currentDirection != Direction.Left) OnLeftKeyDown();
+                        _cycle.OnDead();
+                        OnLocalDead();
                     });
                 }
-            }
-            catch (System.Exception ex)
-            {
-                if (ex is ThreadAbortException)
-                {
-                    // 自機があれば消す。
-                    if (_cycle != null)
-                    {
-                        _gm.Invoke(_ =>
-                        {
-                            _cycle.OnDead();
-                            OnLocalDead();
-                        });
-                    }
-                    Debug.Log("NpcThread Aborted");
-                    return;
-                }
-                Debug.Log("NpcThread Error: " + ex.ToString());
+                Debug.Log("NpcThread Aborted");
+                yield break;
             }
         }
     }
 
     internal void StopNpcThread()
     {
-        if (_threadNpc != null) _threadNpc.Abort();
+        _currentThreadId++;
     }
 
     private Data GetCurrentData(MessageType t)
