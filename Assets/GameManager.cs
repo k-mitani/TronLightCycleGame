@@ -91,16 +91,16 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         // ローカルの操作をPlayerオブジェクトに伝える。
-        if (Input.GetKeyDown(KeyCode.Return))  OnStartButtonPress(myPlayer1);
-        else if (Input.GetKeyDown(KeyCode.UpArrow)) myPlayer1.OnUpKeyDown();
-        else if (Input.GetKeyDown(KeyCode.DownArrow)) myPlayer1.OnDownKeyDown();
-        else if (Input.GetKeyDown(KeyCode.RightArrow)) myPlayer1.OnRightKeyDown();
-        else if (Input.GetKeyDown(KeyCode.LeftArrow)) myPlayer1.OnLeftKeyDown();
-        if (Input.GetKeyDown(KeyCode.F)) myPlayer2.OnStartButtonPress();
-        else if (Input.GetKeyDown(KeyCode.W)) myPlayer2.OnUpKeyDown();
-        else if (Input.GetKeyDown(KeyCode.S)) myPlayer2.OnDownKeyDown();
-        else if (Input.GetKeyDown(KeyCode.D)) myPlayer2.OnRightKeyDown();
-        else if (Input.GetKeyDown(KeyCode.A)) myPlayer2.OnLeftKeyDown();
+        if (Input.GetKeyDown(KeyCode.Return))  OnStartButtonPress(myPlayer2);
+        else if (Input.GetKeyDown(KeyCode.UpArrow)) myPlayer2.OnUpKeyDown();
+        else if (Input.GetKeyDown(KeyCode.DownArrow)) myPlayer2.OnDownKeyDown();
+        else if (Input.GetKeyDown(KeyCode.RightArrow)) myPlayer2.OnRightKeyDown();
+        else if (Input.GetKeyDown(KeyCode.LeftArrow)) myPlayer2.OnLeftKeyDown();
+        if (Input.GetKeyDown(KeyCode.F)) myPlayer1.OnStartButtonPress();
+        else if (Input.GetKeyDown(KeyCode.W)) myPlayer1.OnUpKeyDown();
+        else if (Input.GetKeyDown(KeyCode.S)) myPlayer1.OnDownKeyDown();
+        else if (Input.GetKeyDown(KeyCode.D)) myPlayer1.OnRightKeyDown();
+        else if (Input.GetKeyDown(KeyCode.A)) myPlayer1.OnLeftKeyDown();
 
         if (Input.GetButtonDown("P1Start")) OnStartButtonPress(myPlayer1);
         else if (Input.GetAxis("P1Vertical") < -0.99) myPlayer1.OnUpKeyDown();
