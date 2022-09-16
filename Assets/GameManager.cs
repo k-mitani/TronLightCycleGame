@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviour
 {
@@ -17,8 +18,10 @@ public class GameManager : MonoBehaviour
     public byte myPlayerId2;
     public byte npcPlayerId;
 
-    public PlayerInputHandler player1Input;
-    public PlayerInputHandler player2Input;
+    public GameObject player1InputHandlerPrefab;
+    public GameObject player2InputHandlerPrefab;
+    public PlayerInputHandler player1InputHandler;
+    public PlayerInputHandler player2InputHandler;
 
     private Player[] players;
     private Player myPlayer1 => players[myPlayerId1];
@@ -47,8 +50,9 @@ public class GameManager : MonoBehaviour
         udp.Receive += Udp_Receive;
         StartCoroutine(ApplySettingForStart());
 
-        player1Input.Initialize(this, myPlayer1);
-        player2Input.Initialize(this, myPlayer2);
+
+        player1InputHandler = PlayerInputHandler.Initialize(this, myPlayer1, player1InputHandlerPrefab, 0);
+        player2InputHandler = PlayerInputHandler.Initialize(this, myPlayer2, player2InputHandlerPrefab, 1);
     }
 
     IEnumerator ApplySettingForStart()
