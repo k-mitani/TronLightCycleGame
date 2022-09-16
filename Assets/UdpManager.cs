@@ -55,7 +55,13 @@ public class UdpManager : IDisposable
 		_local = new IPEndPoint(IPAddress.Parse("0.0.0.0"), localPort);
 		_remote = new IPEndPoint(remoteAddress, remotePort);
 		_udp = new UdpClient(localPort);
-		_udp.JoinMulticastGroup(remoteAddress);
+
+		var isMulticast = (remoteAddress.GetAddressBytes()[0] >> 4) == 14;
+        if (isMulticast)
+        {
+			_udp.JoinMulticastGroup(remoteAddress);
+		}
+
 		_thread = new Thread(DoLoop);
 		_thread.Start();
 	}
