@@ -8,6 +8,7 @@ using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviour
 {
+    [NonSerialized] public long clientId = DateTime.Now.ToBinary();
     public UdpManager udp;
     private Queue<Data> queueMessage = new Queue<Data>();
 
@@ -46,13 +47,13 @@ public class GameManager : MonoBehaviour
             players[i] = new Player(this, (byte)i, playerPrefab, color);
         }
 
-        udp = new UdpManager(IPAddress.Parse("192.168.10.1"), 30000, 30000);
+        udp = new UdpManager(clientId, IPAddress.Parse("239.239.239.1"), 30000, 30000);
         udp.Receive += Udp_Receive;
         StartCoroutine(ApplySettingForStart());
 
 
-        player1InputHandler = PlayerInputHandler.Initialize(this, myPlayer1, player1InputHandlerPrefab, 0);
-        player2InputHandler = PlayerInputHandler.Initialize(this, myPlayer2, player2InputHandlerPrefab, 1);
+        player1InputHandler = PlayerInputHandler.Initialize(this, player1InputHandlerPrefab, 0, () => myPlayer1);
+        player2InputHandler = PlayerInputHandler.Initialize(this, player2InputHandlerPrefab, 1, () => myPlayer2);
     }
 
     IEnumerator ApplySettingForStart()
@@ -73,7 +74,7 @@ public class GameManager : MonoBehaviour
         var oldUdp = udp;
         oldUdp.Receive -= Udp_Receive;
         oldUdp.Dispose();
-        udp = new UdpManager(remoteAddress, remotePort, localPort);
+        udp = new UdpManager(clientId, remoteAddress, remotePort, localPort);
         udp.Receive += Udp_Receive;
 
         // プレーヤー設定を更新する。

@@ -47,6 +47,7 @@ public class SettingManager : MonoBehaviour
         }
         catch (System.Exception ex)
         {
+            Debug.LogError(ex);
             errorText.text = ex.ToString();
         }
     }

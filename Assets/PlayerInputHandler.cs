@@ -9,8 +9,8 @@ using UnityEngine.InputSystem.Users;
 public class PlayerInputHandler : MonoBehaviour
 {
     private GameManager gm;
-    private Player player;
-    public static PlayerInputHandler Initialize(GameManager gm, Player player, GameObject prefab, int playerId)
+    private Func<Player> player;
+    public static PlayerInputHandler Initialize(GameManager gm, GameObject prefab, int playerId, Func<Player> player)
     {
         var playerInput = PlayerInput.Instantiate(prefab);
         playerInput.TryGetComponent(out PlayerInputHandler handler);
@@ -61,23 +61,23 @@ public class PlayerInputHandler : MonoBehaviour
 
     public void OnSpawn()
     {
-        player.OnStartButtonPress();
+        player().OnStartButtonPress();
     }
     public void OnUp()
     {
-        player.OnUpKeyDown();
+        player().OnUpKeyDown();
     }
     public void OnDown()
     {
-        player.OnDownKeyDown();
+        player().OnDownKeyDown();
     }
     public void OnLeft()
     {
-        player.OnLeftKeyDown();
+        player().OnLeftKeyDown();
     }
     public void OnRight()
     {
-        player.OnRightKeyDown();
+        player().OnRightKeyDown();
     }
     public void OnEscape()
     {

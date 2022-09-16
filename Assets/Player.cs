@@ -165,6 +165,7 @@ public class Player
     private Data GetCurrentData(MessageType t)
     {
         var d = new Data();
+        d.clientId = _gm.clientId;
         d.type = t;
         d.playerId = playerId;
         d.direction = _cycle.currentDirection;
