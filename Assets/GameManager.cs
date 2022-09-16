@@ -17,6 +17,9 @@ public class GameManager : MonoBehaviour
     public byte myPlayerId2;
     public byte npcPlayerId;
 
+    public PlayerInputHandler player1Input;
+    public PlayerInputHandler player2Input;
+
     private Player[] players;
     private Player myPlayer1 => players[myPlayerId1];
     private Player myPlayer2 => players[myPlayerId2];
@@ -43,6 +46,9 @@ public class GameManager : MonoBehaviour
         udp = new UdpManager(IPAddress.Parse("192.168.10.1"), 30000, 30000);
         udp.Receive += Udp_Receive;
         StartCoroutine(ApplySettingForStart());
+
+        player1Input.Initialize(this, myPlayer1);
+        player2Input.Initialize(this, myPlayer2);
     }
 
     IEnumerator ApplySettingForStart()
@@ -76,52 +82,6 @@ public class GameManager : MonoBehaviour
         npcPlayer.StartNpcThread(npcSpawnOnStart, npcSpawnInterval);
 
         // TODO endless
-    }
-
-    private void OnStartButtonPress(Player player)
-    {
-        player.OnStartButtonPress();
-        npcPlayer.OnPcStart();
-    }
-
-    void Update()
-    {
-        // ローカルの操作をPlayerオブジェクトに伝える。
-        if (Input.GetKeyDown(KeyCode.Return))  OnStartButtonPress(myPlayer1);
-        else if (Input.GetKeyDown(KeyCode.UpArrow)) myPlayer1.OnUpKeyDown();
-        else if (Input.GetKeyDown(KeyCode.DownArrow)) myPlayer1.OnDownKeyDown();
-        else if (Input.GetKeyDown(KeyCode.RightArrow)) myPlayer1.OnRightKeyDown();
-        else if (Input.GetKeyDown(KeyCode.LeftArrow)) myPlayer1.OnLeftKeyDown();
-        if (Input.GetKeyDown(KeyCode.F)) myPlayer2.OnStartButtonPress();
-        else if (Input.GetKeyDown(KeyCode.W)) myPlayer2.OnUpKeyDown();
-        else if (Input.GetKeyDown(KeyCode.S)) myPlayer2.OnDownKeyDown();
-        else if (Input.GetKeyDown(KeyCode.D)) myPlayer2.OnRightKeyDown();
-        else if (Input.GetKeyDown(KeyCode.A)) myPlayer2.OnLeftKeyDown();
-
-        if (Input.GetButtonDown("P1Start")) OnStartButtonPress(myPlayer1);
-        else if (Input.GetAxis("P1Vertical") < -0.99) myPlayer1.OnUpKeyDown();
-        else if (Input.GetAxis("P1Vertical") > +0.99) myPlayer1.OnDownKeyDown();
-        else if (Input.GetAxis("P1Horizontal") > +0.99) myPlayer1.OnRightKeyDown();
-        else if (Input.GetAxis("P1Horizontal") < -0.99) myPlayer1.OnLeftKeyDown();
-        else if (Input.GetAxis("P1VerticalDPad") < -0.99) myPlayer1.OnUpKeyDown();
-        else if (Input.GetAxis("P1VerticalDPad") > +0.99) myPlayer1.OnDownKeyDown();
-        else if (Input.GetAxis("P1HorizontalDPad") > +0.99) myPlayer1.OnRightKeyDown();
-        else if (Input.GetAxis("P1HorizontalDPad") < -0.99) myPlayer1.OnLeftKeyDown();
-        if (Input.GetButtonDown("P2Start")) OnStartButtonPress(myPlayer2);
-        else if (Input.GetAxis("P2Vertical") < -0.99) myPlayer2.OnUpKeyDown();
-        else if (Input.GetAxis("P2Vertical") > +0.99) myPlayer2.OnDownKeyDown();
-        else if (Input.GetAxis("P2Horizontal") > +0.99) myPlayer2.OnRightKeyDown();
-        else if (Input.GetAxis("P2Horizontal") < -0.99) myPlayer2.OnLeftKeyDown();
-        else if (Input.GetAxis("P2VerticalDPad") < -0.99) myPlayer2.OnUpKeyDown();
-        else if (Input.GetAxis("P2VerticalDPad") > +0.99) myPlayer2.OnDownKeyDown();
-        else if (Input.GetAxis("P2HorizontalDPad") > +0.99) myPlayer2.OnRightKeyDown();
-        else if (Input.GetAxis("P2HorizontalDPad") < -0.99) myPlayer2.OnLeftKeyDown();
-
-        // ESCなら設定画面を開く。
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            ui.settings.gameObject.SetActive(!ui.settings.gameObject.activeSelf);
-        }
     }
 
     private void FixedUpdate()
