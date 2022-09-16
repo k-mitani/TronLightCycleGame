@@ -111,6 +111,11 @@ public class Player
                     _signalLocalStart.WaitOne();
                 }
 
+                if (!_gm.ui.settings.toggleSpawnNpc.isOn)
+                {
+                    continue;
+                }
+
                 // 自機を生成する。
                 _gm.Invoke(_ =>
                 {
@@ -162,7 +167,7 @@ public class Player
         if (_threadNpc != null) _threadNpc.Abort();
     }
 
-    private Data GetCurrentData(MessageType t)
+    public Data GetCurrentData(MessageType t)
     {
         var d = new Data();
         d.clientId = _gm.clientId;

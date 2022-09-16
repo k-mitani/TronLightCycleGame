@@ -81,6 +81,6 @@ public class PlayerInputHandler : MonoBehaviour
     }
     public void OnEscape()
     {
-        gm.ui.settings.gameObject.SetActive(!gm.ui.settings.gameObject.activeSelf);
+        gm.ui.settings.Toggle();
     }
 }

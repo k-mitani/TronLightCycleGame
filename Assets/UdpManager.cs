@@ -10,12 +10,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
-[StructLayout(LayoutKind.Sequential, Pack = 1)]
+[StructLayout(LayoutKind.Sequential, Pack = 4)]
 public struct Data
 {
 	public long clientId;
 	public MessageType type;
-	public byte sessionId;
 	public byte playerId;
 	public Direction direction;
 	public Vector3 position;
@@ -28,6 +27,7 @@ public enum MessageType : byte
 	Turn,
 	Dead,
 	Ping,
+	PingResponse,
 }
 
 public enum Direction : byte
@@ -44,8 +44,8 @@ public class UdpManager : IDisposable
 	private long _clientId;
 	private Thread _thread;
 	private UdpClient _udp;
-	private IPEndPoint _local;
-	private IPEndPoint _remote;
+	public IPEndPoint _local;
+	public IPEndPoint _remote;
 
 	public event EventHandler<Data> Receive;
 

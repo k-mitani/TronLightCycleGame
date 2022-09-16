@@ -10,7 +10,7 @@ public class SettingManager : MonoBehaviour
     public TMP_InputField inputRemoteAddress;
     public TMP_InputField inputRemotePort;
     public TMP_InputField inputLocalPort;
-    public Toggle checkEndless;
+    public Toggle checkAutoPlayerId;
     public TMP_InputField inputPlayerId1;
     public TMP_InputField inputPlayerId2;
     public TMP_InputField inputPlayerIdNpc;
@@ -19,6 +19,8 @@ public class SettingManager : MonoBehaviour
 
     public TMP_InputField errorText;
 
+    public Toggle toggleSpawnNpc;
+
     public void OnApplyButtonClick()
     {
         try
@@ -26,7 +28,7 @@ public class SettingManager : MonoBehaviour
             var remoteAddress = IPAddress.Parse(inputRemoteAddress.text);
             var remotePort = int.Parse(inputRemotePort.text);
             var localPort = int.Parse(inputLocalPort.text);
-            var isEndless = checkEndless.isOn;
+            var isAutoPlayerId = checkAutoPlayerId.isOn;
             var playerId1 = byte.Parse(inputPlayerId1.text);
             var playerId2 = byte.Parse(inputPlayerId2.text);
             var playerIdNpc = byte.Parse(inputPlayerIdNpc.text);
@@ -37,7 +39,7 @@ public class SettingManager : MonoBehaviour
                 remoteAddress,
                 remotePort,
                 localPort,
-                isEndless,
+                isAutoPlayerId,
                 playerId1,
                 playerId2,
                 playerIdNpc,
@@ -50,5 +52,27 @@ public class SettingManager : MonoBehaviour
             Debug.LogError(ex);
             errorText.text = ex.ToString();
         }
+    }
+
+    public void Toggle()
+    {
+        if (gameObject.activeSelf)
+        {
+            gameObject.SetActive(false);
+            return;
+        }
+
+        var gm = GameObject.Find("GameManager").GetComponent<GameManager>();
+        inputRemoteAddress.text = gm.udp._remote.Address.ToString();
+        inputRemotePort.text = gm.udp._remote.Port.ToString();
+        inputLocalPort.text = gm.udp._local.Port.ToString();
+        //checkAutoPlayerId.isOn = true;
+        inputPlayerId1.text = gm.myPlayerId1.ToString();
+        inputPlayerId2.text = gm.myPlayerId2.ToString();
+        inputPlayerIdNpc.text = gm.npcPlayerId.ToString();
+        //inputNpcSpawnOnStart.text = ...;
+        //inputNpcSpawnInterval.text = ...;
+
+        gameObject.SetActive(true);
     }
 }
