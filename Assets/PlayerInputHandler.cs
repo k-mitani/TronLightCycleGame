@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Users;
@@ -28,14 +29,24 @@ public class PlayerInputHandler : MonoBehaviour
             if (device is Keyboard) shouldConnect = true;
             // マウスはユーザー0とのみペアリングする。
             else if (device is Mouse && playerId == 0) shouldConnect = true;
-            // ゲームパッドはユーザー0から順番に一人づつペアリングする。
             else if (device is Gamepad)
             {
-                if (playerId == foundGamepadCount)
+                // OnScreenならユーザー0にペアリングする。
+                var isOnScreen = device.usages.Any(x => x.ToString().Equals("OnScreen"));
+                if (isOnScreen)
                 {
-                    shouldConnect = true;
+                    if (playerId == 0) shouldConnect = true;
+                    // ゲームパッドにはカウントしない。
                 }
-                foundGamepadCount++;
+                // 普通のゲームパッドならユーザー0から順番に一人づつペアリングする。
+                else
+                {
+                    if (playerId == foundGamepadCount)
+                    {
+                        shouldConnect = true;
+                    }
+                    foundGamepadCount++;
+                }
             }
             if (shouldConnect)
             {
