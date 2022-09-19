@@ -12,12 +12,8 @@ public class PlayerInputHandler : MonoBehaviour
     private Func<Player> player;
     public static PlayerInputHandler Initialize(GameManager gm, GameObject prefab, int playerId, Func<Player> player)
     {
-        var playerInput = PlayerInput.Instantiate(prefab);
-        playerInput.TryGetComponent(out PlayerInputHandler handler);
-        
-        // まず全部のデバイスとのペアリングを切る。
-        playerInput.user.UnpairDevices();
-        
+        var targetDevices = new List<InputDevice>();
+
         // 接続されているデバイスとペアリングする。
         var devices = InputSystem.devices;
         var foundGamepadCount = 0;
@@ -50,10 +46,14 @@ public class PlayerInputHandler : MonoBehaviour
             }
             if (shouldConnect)
             {
-                InputUser.PerformPairingWithDevice(device, playerInput.user);
+                targetDevices.Add(device);
             }
         }
 
+        var playerInput = PlayerInput.Instantiate(prefab);
+        if (playerInput.user.valid) playerInput.user.UnpairDevices();
+        targetDevices.ForEach(d => InputUser.PerformPairingWithDevice(d, playerInput.user));
+        var handler = playerInput.GetComponent<PlayerInputHandler>();
         handler.gm = gm;
         handler.player = player;
         return handler;
